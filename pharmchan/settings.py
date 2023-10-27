@@ -75,8 +75,12 @@ WSGI_APPLICATION = 'pharmchan.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgesql_psycopg2',
+        'NAME': 'pharmchan',
+        'PASSWORD': 'pharmchan2024',
+        'USER': 'pharmchandjango',
+        'HOST': 'localhost',
+        'PORT': ''
     }
 }
 
