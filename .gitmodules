@@ -1,0 +1,3 @@
+[submodule "pypharm"]
+	path = pypharm
+	url = https://github.com/Krash13/PyPharm.git
