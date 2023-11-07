@@ -9,12 +9,14 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
+from machina import MACHINA_MAIN_TEMPLATE_DIR,MACHINA_MAIN_STATIC_DIR
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+PROJECT_PATH = Path(__file__).parents[1]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -37,6 +39,24 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    # Machina dependencies:
+    'mptt',
+    'haystack',
+    'widget_tweaks',
+
+    # Machina apps:
+    'machina',
+    'machina.apps.forum',
+    'machina.apps.forum_conversation',
+    'machina.apps.forum_conversation.forum_attachments',
+    'machina.apps.forum_conversation.forum_polls',
+    'machina.apps.forum_feeds',
+    'machina.apps.forum_moderation',
+    'machina.apps.forum_search',
+    'machina.apps.forum_tracking',
+    'machina.apps.forum_member',
+    'machina.apps.forum_permission',
 ]
 
 MIDDLEWARE = [
@@ -47,6 +67,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'machina.apps.forum_permission.middleware.ForumPermissionMiddleware'
 ]
 
 ROOT_URLCONF = 'pharmchan.urls'
@@ -54,15 +75,22 @@ ROOT_URLCONF = 'pharmchan.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [
+            MACHINA_MAIN_TEMPLATE_DIR
+        ],
+        #'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'machina.core.context_processors.metadata'
             ],
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+            ]
         },
     },
 ]
@@ -75,7 +103,7 @@ WSGI_APPLICATION = 'pharmchan.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgesql_psycopg2',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'pharmchan',
         'PASSWORD': 'pharmchan2024',
         'USER': 'pharmchandjango',
@@ -121,7 +149,33 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIR = [MACHINA_MAIN_STATIC_DIR]
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    },
+    'machina_attachments': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/tmp',
+    },
+}
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
+    },
+}
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        'PATH': os.path.join(PROJECT_PATH, 'whoosh_index'),
+    },
+}
