@@ -19,29 +19,7 @@ class MEOutgo:
         self.value = value
         self.from_id = from_id
         self.id = uuid.uuid1()
-
-    def as_outgo(dct):
-        if not ('__outgo__' in dct):
-            raise NameError("string does not represent outgos object")
-        id = dct.get("id")
-        from_id = dct.get("from_id")
-        value = dct.get("value")
-        comment = dct.get("comment")
-        if id is None:
-            raise NameError("json string does not contain id required field")
-        if from_id is None:
-            raise NameError("json string does not contain from_id required field")
-        if not isinstance(value,(float,int,NoneType)):
-            raise NameError("value field has incorrect type if given json string")
-        ret = MEOutgo(value,uuid.UUID(from_id))
-        ret.id = uuid.UUID(id)
-        if comment is not None:
-            if isinstance(comment,str):
-                ret.comment = comment
-            else:
-                raise NameError("comment optional field is not a sting")
-        return ret
-
+  
 class MEVolume:
     comment = ''
     id = None
@@ -58,31 +36,6 @@ class MEVolume:
         self.comment = comment
         self.name = name
         self.id = uuid.uuid1()
-
-    def as_volume(dct):
-        if not ('__volume__' in dct) :
-            raise NameError("string does not represent volume object")
-        id = dct.get("id")
-        name = dct.get("name")
-        comment = dct.get("comment")
-        value = dct.get("value")
-        if id is None:
-            raise NameError("json string does not contain id required field")
-        if not isinstance(value,(float,int,NoneType)):
-            raise NameError("value field has incorrect type if given json string")
-        ret = MEVolume(value)
-        ret.id = uuid.UUID(id)
-        if name is not None:
-            if isinstance(name,str):
-                ret.name = name
-            else:
-                raise NameError("name optional field is not a string")
-        if comment is not None:
-            if isinstance(comment,str):
-                ret.name = comment
-            else:
-                raise NameError("comment optional field is not a string")
-        return ret
 
 class METransfer:
     comment = ''
@@ -110,32 +63,7 @@ class METransfer:
         self.to_id = to_id
         self.comment = comment
         self.id = uuid.uuid1()
-        
-    def as_transfer(dct):
-        if not ('__transfer__' in dct):
-            raise NameError("string does not represent transfer object")
-        id = dct.get("id")
-        from_id = dct.get("from_id")
-        to_id = dct.get("to_id")
-        value = dct.get("value")
-        comment = dct.get("comment")
-        if id is None:
-            raise NameError("json string does not contain id required field")
-        if from_id is None:
-            raise NameError("json string does not contain from_id required field")
-        if to_id is None:
-            raise NameError("json string does not contain to_id required field")
-        if not isinstance(value,(float,int,NoneType)):
-            raise NameError("value field has incorrect type if given json string")
-        ret = METransfer(value,uuid.UUID(from_id),uuid.UUID(to_id))
-        ret.id = uuid.UUID(id)
-        if comment is not None:
-            if isinstance(comment,str):
-                ret.comment = comment
-            else:
-                raise NameError("comment optional field is not a sting")
-        return ret
-
+    
 class MESystem:
     volumes = {}
     transfers = {}
@@ -224,19 +152,6 @@ class MESystem:
         else:
             raise NameError("transfer parameter must be either METransfer or list of METransfer")
 
-    def as_system(dct):
-        if "__system__" in dct:            
-            system = MESystem()
-            return system
-        elif "__volume__" in dct:
-            return MEVolume.as_volume(dct)
-        elif "__transfer__" in dct:
-            return METransfer.as_transfer(dct)
-        elif "__outgo__" in dct:
-            return MEOutgo.as_outgo(dct)
-        else:
-            raise NameError("string does not represent system object")
-
     def to_inner_representation(self):
         n = len(self.volumes)
         matrix = [[0.0]*n]*n
@@ -266,3 +181,87 @@ class MEEncoder(json.JSONEncoder):
         else:
             return json.JSONEncoder.default(self, obj)
 
+    def as_system(dct):
+        if "__system__" in dct:            
+            system = MESystem(dct['volumes'],dct['transfers'],dct['outgos'],dct['comment'])
+            return system
+        elif "__volume__" in dct:
+            return MEEncoder.as_volume(dct)
+        elif "__transfer__" in dct:
+            return MEEncoder.as_transfer(dct)
+        elif "__outgo__" in dct:
+            return MEEncoder.as_outgo(dct)
+        else:
+            raise NameError("string does not represent system object")
+            
+    def as_volume(dct):
+        if not ('__volume__' in dct) :
+            raise NameError("string does not represent volume object")
+        id = dct.get("id")
+        name = dct.get("name")
+        comment = dct.get("comment")
+        value = dct.get("value")
+        if id is None:
+            raise NameError("json string does not contain id required field")
+        if not isinstance(value,(float,int,NoneType)):
+            raise NameError("value field has incorrect type if given json string")
+        ret = MEVolume(value)
+        ret.id = uuid.UUID(id)
+        if name is not None:
+            if isinstance(name,str):
+                ret.name = name
+            else:
+                raise NameError("name optional field is not a string")
+        if comment is not None:
+            if isinstance(comment,str):
+                ret.name = comment
+            else:
+                raise NameError("comment optional field is not a string")
+        return ret
+        
+    def as_transfer(dct):
+        if not ('__transfer__' in dct):
+            raise NameError("string does not represent transfer object")
+        id = dct.get("id")
+        from_id = dct.get("from_id")
+        to_id = dct.get("to_id")
+        value = dct.get("value")
+        comment = dct.get("comment")
+        if id is None:
+            raise NameError("json string does not contain id required field")
+        if from_id is None:
+            raise NameError("json string does not contain from_id required field")
+        if to_id is None:
+            raise NameError("json string does not contain to_id required field")
+        if not isinstance(value,(float,int,NoneType)):
+            raise NameError("value field has incorrect type if given json string")
+        ret = METransfer(value,uuid.UUID(from_id),uuid.UUID(to_id))
+        ret.id = uuid.UUID(id)
+        if comment is not None:
+            if isinstance(comment,str):
+                ret.comment = comment
+            else:
+                raise NameError("comment optional field is not a sting")
+        return ret
+
+    def as_outgo(dct):
+        if not ('__outgo__' in dct):
+            raise NameError("string does not represent outgos object")
+        id = dct.get("id")
+        from_id = dct.get("from_id")
+        value = dct.get("value")
+        comment = dct.get("comment")
+        if id is None:
+            raise NameError("json string does not contain id required field")
+        if from_id is None:
+            raise NameError("json string does not contain from_id required field")
+        if not isinstance(value,(float,int,NoneType)):
+            raise NameError("value field has incorrect type if given json string")
+        ret = MEOutgo(value,uuid.UUID(from_id))
+        ret.id = uuid.UUID(id)
+        if comment is not None:
+            if isinstance(comment,str):
+                ret.comment = comment
+            else:
+                raise NameError("comment optional field is not a sting")
+        return ret
