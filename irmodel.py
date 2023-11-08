@@ -4,11 +4,16 @@ import json
 # TODO: create own error types
 # TODO: add docstrings
 class MEOutgo:
-    comment = ''
-    id = None
-    from_id = None
-    value = None
+    #comment = ''
+    #id = None
+    #from_id = None
+    #value = None
     def __init__(self, value: float,from_id: uuid.UUID, comment: str = ''):
+        self.id = None
+        self.from_id = None
+        self.value = None
+        self.comment = ''
+
         if not isinstance(comment, str):
             raise NameError("comment is not a string")
         if not isinstance(value, (float,int,NoneType)):
@@ -21,11 +26,16 @@ class MEOutgo:
         self.id = uuid.uuid1()
   
 class MEVolume:
-    comment = ''
-    id = None
-    name = ''
-    value = None
+    #comment = ''
+    #id = None
+    #name = ''
+    #value = None
     def __init__(self, value: float,name: str = '', comment: str = ''):
+        self.id = None
+        self.name = ''
+        self.comment = ''
+        self.value = None
+
         if not isinstance(value, (float,int,NoneType)):
             raise NameError("value is not float")
         if not isinstance(comment, str):
@@ -38,12 +48,18 @@ class MEVolume:
         self.id = uuid.uuid1()
 
 class METransfer:
-    comment = ''
-    id = None
-    from_id = None
-    to_id = None
-    value = None
+    #comment = ''
+    #id = None
+    #from_id = None
+    #to_id = None
+    #value = None
     def __init__(self,value: float, from_id: uuid.UUID, to_id: uuid.UUID, comment: str = ''):
+        self.id = None
+        self.from_id = None
+        self.to_id = None
+        self.value = None
+        self.comment = ''
+
         if not isinstance(value, (float,int,NoneType)):
             raise NameError("value is not float")
         if not isinstance(comment, str):
@@ -65,20 +81,44 @@ class METransfer:
         self.id = uuid.uuid1()
     
 class MESystem:
-    volumes = {}
-    transfers = {}
-    outgos = {}
-    comment = ''
-    def __init__(self,volumes: list = [],transfers: list = [], outgos: list = [], comment: str = ''):
-        if len(volumes) > 0 and not isinstance(volumes[0], MEVolume):
-            raise NameError("volumes parameter has to be list of MEVolume")
-        if len(transfers) > 0 and not isinstance(transfers[0], METransfer):
-            raise NameError("transfers parameter has to be list of METransfer")
-        if len(outgos) > 0 and not isinstance(outgos[0], MEOutgo):
-            raise NameError("outgos has to be list of MEOoutgo")
+    #volumes = {}
+    #transfers = {}
+    #outgos = {}
+    #comment = ''
+    #name = ''
+    def __init__(self,volumes: list = [],transfers: list = [], outgos: list = [],name: str = '', comment: str = ''):
+        self.volumes = {}
+        self.transfers = {}
+        self.outgos = {}
+        self.comment = ''
+        self.name = ''
+        
+        if not isinstance(volumes,list):
+            raise NamedError("volumes is not list")
+        
+        if not all(map(lambda i: isinstance(i,MEVolume),volumes)):
+            raise NamedError("volumes is not a list of MEVolume")
+        
+        if not isinstance(transfers,list):
+            raise NamedError("transfers is not list")
+        
+        if not all(map(lambda i: isinstance(i,METransfer),transfers)):
+            raise NamedError("transfers is not a list of METransfer")
+        
+        if not isinstance(outgos,list):
+            raise NamedError("outgos is not list")
+        
+        if not all(map(lambda i: isinstance(i,MEOutgo),outgos)):
+            raise NamedError("outgos is not a list of MEOutgo")
+        
+        if not isinstance(name,str):
+            raise NameError("name has to be a string")
+        
         if not isinstance(comment,str):
             raise NameError("comment has to be a string")
+        
         self.comment = comment
+        self.name = name
         for v in volumes:
             if self.volumes.get(v.id) is not None:
                 raise NameError("volume with such uuid already exists")
@@ -97,8 +137,8 @@ class MESystem:
     def add_volumes(self,volume):
         #pdb.breakpoint()
         if isinstance(volume, list):
-            if len(volume) > 0 and not isinstance(volume[0], MEVolume):
-                raise NameError("volume list is not of type MEVolume")
+            if not all(map(lambda i: isinstance(i,MEVolume),volumes)):
+                raise NamedError("volumes is not a list of MEVolume")
             for v in volume:
                 if self.volumes.get(v.id) is not None:
                     raise NameError("volume with such uuid already exists")
@@ -112,8 +152,8 @@ class MESystem:
 
     def add_outgos(self,outgo):
         if isinstance(outgo, list):
-            if len(outgo) > 0 and not isinstance(outgo[0], MEOutgo):
-                raise NameError("outgo list is not of type MEOutgo")
+            if not all(map(lambda i: isinstance(i,MEOutgos),outgos)):
+                raise NamedError("outgos is not a list of MEOutgo")
             for o in outgo:
                 if self.outgos.get(o.id) is not None:
                     raise NameError("outgo with such uuid already exists")
@@ -131,8 +171,8 @@ class MESystem:
 
     def add_transfers(self,transfer):
         if isinstance(transfer, list):
-            if len(transfer) > 0 and not isinstance(transfer[0], METransfer):
-                raise NameError("transfer list is not of type METransfer")
+            if not all(map(lambda i: isinstance(i,METransfers),transfers)):
+                raise NamedError("transfers is not a list of METransfer")
             for o in transfer:
                 if self.transfers.get(t.id) is not None:
                     raise NameError("transfer with such uuid already exists")
@@ -177,13 +217,13 @@ class MEEncoder(json.JSONEncoder):
         elif isinstance(obj,MEOutgo):
             return {"value":obj.value,"comment":obj.comment,"from_id":obj.from_id.hex,"id":obj.id.hex,"__outgo__":True}
         elif isinstance(obj,MESystem):
-            return {"volumes":[self.default(v) for v in obj.volumes.values()],"transfers":[self.default(t) for t in obj.transfers.values()],"outgos":[self.default(o) for o in obj.outgos.values()],"comment":obj.comment,"__system__":True}
+            return {"volumes":[self.default(v) for v in obj.volumes.values()],"transfers":[self.default(t) for t in obj.transfers.values()],"outgos":[self.default(o) for o in obj.outgos.values()],"name":obj.name,"comment":obj.comment,"__system__":True}
         else:
             return json.JSONEncoder.default(self, obj)
 
     def as_system(dct):
-        if "__system__" in dct:            
-            system = MESystem(dct['volumes'],dct['transfers'],dct['outgos'],dct['comment'])
+        if "__system__" in dct:
+            system = MESystem(dct.get('volumes'),dct.get('transfers'),dct.get('outgos'),dct.get('name'),dct.get('comment'))
             return system
         elif "__volume__" in dct:
             return MEEncoder.as_volume(dct)
