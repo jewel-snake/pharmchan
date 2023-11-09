@@ -113,7 +113,8 @@ class MESystem:
         
         if not isinstance(name,str):
             raise NameError("name has to be a string")
-        
+        if len(name) > 50:
+            raise NameError("name's length has not to exceed 50")
         if not isinstance(comment,str):
             raise NameError("comment has to be a string")
         
