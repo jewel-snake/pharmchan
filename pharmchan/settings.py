@@ -58,6 +58,9 @@ INSTALLED_APPS = [
     'machina.apps.forum_member',
     'machina.apps.forum_permission',
 
+    # REST framework
+    'rest_framework',
+
     # pharmchan apps:
     'compmodel'
 ]
@@ -109,7 +112,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'pharmchan',
         'PASSWORD': 'pharmchan2024',
-        'USER': 'pharmchandjango',
+        'USER': 'pharmchandjango_server',
         'HOST': 'localhost',
         'PORT': ''
     }
@@ -181,4 +184,12 @@ HAYSTACK_CONNECTIONS = {
         'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
         'PATH': os.path.join(PROJECT_PATH, 'whoosh_index'),
     },
+}
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
 }
