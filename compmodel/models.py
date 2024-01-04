@@ -12,5 +12,5 @@ class CompModel(models.Model):
     при первичном создании и каждой десериализации.
     """
     author = models.ForeignKey(User,on_delete=models.SET_NULL,null=True)
-    body = models.TextField(null=False,blank=False,default='{"volumes": [], "transfers": [], "outgos": [], "name": "", "comment": "", "__system__": true}')
+    body = models.JSONField(null=False,blank=False)
     name = models.CharField(50,null=False,blank=True)
