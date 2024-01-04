@@ -20,5 +20,6 @@ from machina import urls as machina_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('forum/', include(machina_urls))
+    path('forum/', include(machina_urls)),
+    path('api-auth/', include('rest_framework.urls'))
 ]
