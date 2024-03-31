@@ -17,9 +17,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 from machina import urls as machina_urls
+from rest_framework import routers
+from compmodel import views
+
+router = routers.DefaultRouter()
+#router.register(r'compmodel',views.CompModelViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('forum/', include(machina_urls)),
-    path('api-auth/', include('rest_framework.urls'))
+    path('api-auth/', include('rest_framework.urls')),
+    path('',include('compmodel.urls'))
 ]
+
+urlpatterns += router.urls
