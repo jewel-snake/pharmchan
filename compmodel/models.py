@@ -27,5 +27,9 @@ class Solution(models.Model):
     model = models.ForeignKey(CompModel,on_delete=models.CASCADE,null=False)
     body = models.JSONField(null=False,blank=False)
 
-#class DataSet(models.Model):
-    
+class DataSet(models.Model):
+    """
+        класс набора экспериментальных данных
+    """
+    body = models.JSONField(null=False,blank=False)
+    name = models.CharField(max_length=50,null=False,blank=False)
