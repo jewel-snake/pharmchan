@@ -47,7 +47,7 @@ def compmodel_single(request, pk):
     #if method is put, update compmodel
     elif request.method == 'PUT':
         data = JSONParser().parse(data=request)
-        serializer = serializer.CompModelSerializer(data=data)
+        serializer = serializers.CompModelSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return JSONResponse(serializer.data)
