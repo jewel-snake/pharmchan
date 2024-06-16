@@ -28,3 +28,5 @@ class CompModelPreviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompModel
         fields = ['id','name','author']
+
+#class 
