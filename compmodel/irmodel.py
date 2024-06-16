@@ -207,7 +207,7 @@ class MESystem:
             matrix[layout[t.from_id]][layout[t.to_id]] = t.value
         for o in self.outgos.values():
             outgos[layout[o.from_id]] = o
-        return {"volumes":volumes,"matrix":matrix,"outgos":outgos}
+        return {"volumes":volumes,"matrix":matrix,"output":outgos}
             
         #raise NameError("TODO")
 
